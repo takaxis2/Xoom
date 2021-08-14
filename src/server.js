@@ -13,10 +13,18 @@ app.get("/*", (req, res) => res.redirect("/"));
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-function handleConnection(socket) {
-  console.log(socket);
-}
-wss.on("connection", handleConnection);
+wss.on("connection", (socket) => {
+  console.log("connected to browser");
+  socket.on("close", () => {
+    console.log("disconnected from browser");
+  });
+
+  socket.on("message", (message) => {
+    console.log(message.toString("utf-8"));
+  });
+
+  socket.send("hello!!!");
+});
 
 server.listen(3000, () => {
   console.log("listening on port 3000");
