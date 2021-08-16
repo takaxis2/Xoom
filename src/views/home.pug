@@ -10,8 +10,11 @@ html(lang="en")
         header 
             h1 Xoom
         main 
+            form#nick
+                input(type="text" placeholder="Choose a nickname" required)
+                button Save
             ul 
-            form
+            form#msg
                 input(type="text" placeholder="Write a Message" required) 
                 button  Send
         script(src="/public/js/app.js") 
