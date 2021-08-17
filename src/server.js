@@ -1,6 +1,6 @@
 import http from "http";
-import WebSocket from "ws";
 import express from "express";
+import SocketIo from "socket.io";
 
 const app = express();
 
@@ -10,38 +10,46 @@ app.use("/public", express.static(__dirname + "/public"));
 app.get("/", (req, res) => res.render("home"));
 app.get("/*", (req, res) => res.redirect("/"));
 
-const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const httpServer = http.createServer(app);
+const ioServer = SocketIo(httpServer);
 
-const sockets = [];
-
-wss.on("connection", (socket) => {
-  socket["nickname"] = "Anonymous";
-  sockets.push(socket);
-
-  console.log("connected to browser");
-  socket.on("close", () => {
-    console.log("disconnected from browser");
-  });
-
-  socket.on("message", (message) => {
-    const msg = JSON.parse(message);
-
-    switch (msg.type) {
-      case "message":
-        sockets.forEach((aSocket) => {
-          aSocket.send(`${socket.nickname} : ${msg.payload.toString()}`);
-        });
-        break;
-      case "nickname":
-        socket["nickname"] = msg.payload;
-        break;
-    }
-
-    //console.log(message.toString("utf-8"));
+ioServer.on("connection", (socket) => {
+  socket.on("enter_room", (roomName, showRoom) => {
+    socket.join(roomName);
+    showRoom();
+    socket.to(roomName).emit("welcome");
   });
 });
 
-server.listen(3000, () => {
+// const sockets = [];
+
+// wss.on("connection", (socket) => {
+//   socket["nickname"] = "Anonymous";
+//   sockets.push(socket);
+
+//   console.log("connected to browser");
+//   socket.on("close", () => {
+//     console.log("disconnected from browser");
+//   });
+
+//   socket.on("message", (message) => {
+//     const msg = JSON.parse(message);
+
+//     switch (msg.type) {
+//       case "message":
+//         sockets.forEach((aSocket) => {
+//           aSocket.send(`${socket.nickname} : ${msg.payload.toString()}`);
+//         });
+//         break;
+//       case "nickname":
+//         socket["nickname"] = msg.payload;
+//         break;
+//     }
+
+//     //console.log(message.toString("utf-8"));
+//   });
+// });
+
+httpServer.listen(3000, () => {
   console.log("listening on port 3000");
 });
