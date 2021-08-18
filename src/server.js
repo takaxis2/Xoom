@@ -14,10 +14,25 @@ const httpServer = http.createServer(app);
 const ioServer = SocketIo(httpServer);
 
 ioServer.on("connection", (socket) => {
+  //방 입장
   socket.on("enter_room", (roomName, showRoom) => {
     socket.join(roomName);
     showRoom();
     socket.to(roomName).emit("welcome");
+  });
+
+  //방 퇴장시에 join중인 방을 순회하며 bye를 emit
+  socket.on("disconnecting", () => {
+    socket.rooms.forEach((room) => {
+      socket.to(room).emit("bye");
+    });
+  });
+
+  //새로운 메세지 이벤트
+  socket.on("new_message", (msg, room, done) => {
+    console.log(msg);
+    socket.to(room).emit("new_message", msg);
+    done();
   });
 });
 
