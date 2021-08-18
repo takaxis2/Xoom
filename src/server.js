@@ -14,25 +14,32 @@ const httpServer = http.createServer(app);
 const ioServer = SocketIo(httpServer);
 
 ioServer.on("connection", (socket) => {
+  socket["name"] = "Anonymous";
+
   //방 입장
   socket.on("enter_room", (roomName, showRoom) => {
     socket.join(roomName);
     showRoom();
-    socket.to(roomName).emit("welcome");
+    socket.to(roomName).emit("welcome", socket.name);
   });
 
   //방 퇴장시에 join중인 방을 순회하며 bye를 emit
   socket.on("disconnecting", () => {
     socket.rooms.forEach((room) => {
-      socket.to(room).emit("bye");
+      socket.to(room).emit("bye", socket.name);
     });
   });
 
   //새로운 메세지 이벤트
   socket.on("new_message", (msg, room, done) => {
-    console.log(msg);
-    socket.to(room).emit("new_message", msg);
+    //console.log(msg);
+    socket.to(room).emit("new_message", `${socket.name}: ${msg}`);
     done();
+  });
+
+  //이름 설정
+  socket.on("name", (name) => {
+    socket["name"] = name;
   });
 });
 

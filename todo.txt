@@ -1,0 +1,8 @@
+//재밋는거
+
+ * 서버를 가져오고 io.sockets.emit으로 전체에게 메세지 전송
+ * io.in("asd").socketsJoin(["qwe",ert])이런식으로 한번에 많은 방에 입장, force sockets to join the room
+ *
+
+ //할거
+ * 방에 입장 전에 아이디 값을 받아서 설정하기
