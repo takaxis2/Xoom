@@ -64,3 +64,17 @@ socket.on("bye", (user) => {
 
 socket.on("new_message", addMessage);
 //위에거랑 (msg)=>{addMessage(msg)}랑 같다
+
+socket.on("room_change", (rooms) => {
+  const roomList = welcome.querySelector("ul");
+  roomList.innerHTML = "";
+  if (rooms.length === 0) {
+    return;
+  }
+
+  rooms.forEach((_room) => {
+    const room = document.createElement("li");
+    room.innerText = _room;
+    roomList.append(room);
+  });
+});
